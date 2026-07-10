@@ -12,37 +12,34 @@
 | 文件 | 说明 |
 | --- | --- |
 | `miband7.bin` | 小米手环 7 NFC 原始表盘 |
-| `miband9.bin` | 实验性副本，尚未经过小米手环 9 真机或专用编译器验证 |
-
-> 注意：当前 `miband9.bin` 与 `miband7.bin` 的内容完全相同。两者使用相同的 SHA-256，不能仅凭同为 192 × 490 分辨率就认定兼容。详细检查见 `docs/MIBAND9_COMPATIBILITY.md`。
 
 ## 仓库结构
 
 ```text
 miband-watchfaces/
 ├── README.md
-├── docs/
-│   └── MIBAND9_COMPATIBILITY.md
 └── source/
     ├── README.md
     ├── app.json
     ├── app.bin
-    └── miband10plus/
+    └── miband10pro/
         ├── README.md
         ├── reference/
         │   └── amazfit-band7/
-        └── project/
+        ├── project/
+        └── tools/
 ```
 
 - `source/app.json`、`source/app.bin`：原 TIME FLIES 表盘保留下来的核心配置和编译组件。
-- `source/miband10plus/reference/`：保存拆出的参考工程，保持原始结构。
-- `source/miband10plus/project/`：Mi Band 10 适配开发工程。
+- `source/miband10pro/reference/`：保存拆出的 Zepp OS 参考工程。
+- `source/miband10pro/project/`：Xiaomi Smart Band 10 Pro 表盘开发工程。
+- `source/miband10pro/tools/`：资源转换与构建辅助工具。
 
-## Mi Band 10 适配状态
+## Xiaomi Smart Band 10 Pro 开发状态
 
-已经找到并拆出一个 Amazfit Band 7 Zepp OS 表盘工程。它包含可读的 `watchface/default-target/index.js`，可用于分析 Zepp OS 控件、坐标和布局逻辑。
+当前公开信息显示 Smart Band 10 Pro 采用 1.74 英寸 AMOLED 宽屏形态。开发画布暂按 `400 × 480` 纵向坐标处理，同时保留切换为 `480 × 400` 的可能；最终方向、设备平台 ID 和包格式必须以正式 SDK 或真机验证为准。
 
-目标画布暂按 Xiaomi Smart Band 10 的 `212 × 520` 处理。参考工程不是 Mi Band 10 成品；开发代码放在 `project/`，不会直接修改参考源码。
+目前项目已经接入时间、日期、步数、心率、电量和节日信息，正在迁移 TIME FLIES 图片资源。
 
 ## 使用说明
 
@@ -50,10 +47,8 @@ miband-watchfaces/
 2. 下载对应设备的 `.bin` 文件。
 3. 使用支持该设备和包格式的工具进行安装。
 4. 安装前建议先备份原表盘文件。
-5. `miband9.bin` 目前仅供实验，不建议在无法恢复设备的情况下尝试。
 
 ## 文件信息
 
 - `miband7.bin`：约 209 KB
-- `miband9.bin`：约 209 KB，内容与 Mi Band 7 文件相同，状态为未验证
 - SHA-256：`8caf6df2d77a6829545ddfbe3ec6ff8f9e380e2bfebdaeb76dcb1a75352df1e4`
