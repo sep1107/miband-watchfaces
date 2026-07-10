@@ -6,11 +6,11 @@
     "appName": "TIME FLIES - Smart Band 10 Pro",
     "appType": "watchface",
     "version": {
-      "code": 1,
-      "name": "0.2.0"
+      "code": 2,
+      "name": "0.3.0"
     },
     "vender": "sep1107",
-    "description": "Provisional TIME FLIES source scaffold for Xiaomi Smart Band 10 Pro"
+    "description": "Provisional TIME FLIES image-layout project for Xiaomi Smart Band 10 Pro"
   },
   "permissions": [],
   "runtime": {
@@ -33,10 +33,9 @@
   },
   "designWidth": 400,
   "notes": {
-    "reportedPanelResolution": "480x400",
     "provisionalCanvas": "400x480",
-    "deviceSource": "TODO: verify with a Smart Band 10 Pro compiler profile",
-    "packageFormat": "TODO: verify HyperOS/EasyFace target format",
-    "status": "development scaffold; not yet buildable or installable"
+    "deviceSource": "TODO: verify with an official or proven Smart Band 10 Pro compiler profile",
+    "packageFormat": "TODO: verify target firmware package format",
+    "status": "source project; not yet installable"
   }
 }
