@@ -3,7 +3,7 @@
 ## 暂定开发目标
 
 ```text
-开发版本：0.4.0
+开发版本：0.5.0
 开发画布：400 × 480
 目标型号：Xiaomi Smart Band 10 Pro
 状态：尚未取得正式 SDK、deviceSource 或真机验证
@@ -38,36 +38,56 @@
 - 传感器事件监听与销毁清理。
 - 集中定义屏幕尺寸、面板位置和素材根目录。
 
-## 天气实现
+## v0.5.0 新增
 
-使用 `hmSensor.id.WEATHER` 调用 `getForecastWeather()`，读取当天 `forecastData.data[0]` 的：
+- 新增 `required-assets.json`，列出运行时实际引用的 57 个必需素材。
+- 新增 `tools/validate_project.py`，用于校验配置、JavaScript 语法和 PNG 资源。
+- 新增 `tools/build_app_json.py`，在拿到已验证的 `deviceSource` 后生成正式 `app.json`。
+- 新增 GitHub Actions 工作流，对每次提交做文本源码校验。
+- 新增 `COMPILER_RESEARCH.md`，记录 EasyFace v4.22 对普通 Mi Band 10 的支持以及 10 Pro 仍未确认的问题。
 
-- `index`：映射到 `assets/weather/0.png`～`28.png`。
-- `high`：当天最高温。
-- `low`：当天最低温。
+## 校验
 
-天气不可用时显示占位符，不阻断表盘其他功能。
+完整开发包内可执行：
 
-## 素材迁移
+```bash
+python tools/validate_project.py .
+```
 
-原 TIME FLIES 包中的图片虽然使用 `.png` 扩展名，内容实际是 TGA。开发包已将全部 157 个资源转换成真实的 32 位 RGBA PNG，并逐个验证可读取。
+GitHub 文本源码仓库中不包含全部 PNG，使用：
 
-当前主要尺寸：
+```bash
+python source/miband10pro/tools/validate_project.py source/miband10pro/project --source-only
+```
 
-- 背景：188 × 480，放在 400 × 480 画布左侧。
-- 时间数字：64 × 97。
-- 星期图片：48 × 25。
-- 天气图标：48 × 48。
-- 电量图：50 × 20。
+## 生成 app.json
 
-`../tools/prepare_assets.py` 可用于重新生成其他画布和倍率的素材。
+只有在确认 Smart Band 10 Pro 的真实 `deviceSource` 后才生成正式配置：
 
-## v0.4.0 静态检查
+```bash
+python tools/build_app_json.py \
+  device/app.json.example \
+  device/app.json \
+  --platform-name "Xiaomi Smart Band 10 Pro" \
+  --device-source VERIFIED_INTEGER \
+  --design-width 400 \
+  --release
+```
+
+不要使用猜测值替代 `VERIFIED_INTEGER`。
+
+## EasyFace 研究结论
+
+EasyFace Compiler v4.22 的发布说明写明加入了普通 Mi Band 10 支持，但没有明确写 Smart Band 10 Pro。普通 Mi Band 10 配置不能直接改名当作 10 Pro 配置。
+
+## v0.5.0 静态检查
 
 - `app.js` JavaScript 语法检查通过。
 - `watchface/default-target/index.js` JavaScript 语法检查通过。
-- 157 个 PNG 文件全部通过格式验证。
-- 完整开发包 SHA-256：`a075881ccb1ef92fd7b554b3977af1b7feadf00771c470cfbca219c5f6e780ba`。
+- 运行时必需的 57 个 PNG 素材全部通过格式验证。
+- 完整开发包内 157 个 PNG 素材全部通过格式验证。
+- `tools/build_app_json.py` 已通过临时配置生成测试。
+- 完整开发包 SHA-256：`dcf239a7ac00a581ef5dbece9535b3ccc251076d56ca269cc9f448212b4cb5ce`。
 
 ## 仍然缺少
 
