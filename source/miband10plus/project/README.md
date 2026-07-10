@@ -1,34 +1,52 @@
-# Mi Band 10 Plus 适配工程
+# Mi Band 10 adaptation project
 
-> 当前暂按 Xiaomi Smart Band 10 的 `212 × 520` 屏幕建立开发骨架。
+> The scaffold currently targets the Xiaomi Smart Band 10 display size: `212 × 520`.
 >
-> 公开型号中暂未确认正式名称为 “Mi Band 10 Plus” 的独立设备，因此设备平台 ID 和最终包格式仍需在编译前确认。
+> Xiaomi's official product range lists Band 10, Glimmer Edition and Ceramic Edition. A separate official model named “Mi Band 10 Plus” has not been confirmed, so the final platform ID and package profile must still be verified before building.
 
-## 目录
+## Directory
 
 ```text
 project/
 ├── README.md
+├── ASSET_INVENTORY.md
 └── device/
     ├── app.json.example
     ├── app.js
     ├── assets/
-    │   └── .gitkeep
+    │   └── README.md
     └── watchface/
         └── default-target/
             └── index.js
+
+../tools/
+└── prepare_assets.py
 ```
 
-## 当前阶段
+## Current scaffold features
 
-- 已建立 212 × 520 的布局坐标系。
-- 已加入 TIME FLIES 标题、时间文本和节日文本的初始控件。
-- `app.json.example` 暂不包含未验证的设备 `deviceSource`。
-- 当前代码属于开发骨架，尚未经过 Mi Band 10 真机或模拟器编译验证。
+- 212 × 520 layout coordinate system.
+- TIME FLIES title.
+- Current hour and minute.
+- Current date.
+- Step count.
+- Last measured heart rate.
+- Battery percentage.
+- Chinese festival or solar-term text when supported by the device language and runtime.
+- Sensor listeners and cleanup in `onDestroy()`.
 
-## 后续
+## Asset work
 
-1. 确认 Mi Band 10 对应的设备平台 ID、包格式和编译器版本。
-2. 将原 TIME FLIES 图片资源迁入 `assets/`。
-3. 按 212 × 520 重新计算时间、日期、天气和状态图标位置。
-4. 使用 EasyFace Gen2 或匹配的编译链进行首次构建。
+The original TIME FLIES package contains 157 selected image resources. The files use TGA binary data even though their filenames end with `.png`.
+
+`../tools/prepare_assets.py` can generate a provisional 212 × 520 resource set using ImageMagick. This is only a mechanical first pass; important digits and icons still need visual inspection and manual cleanup.
+
+## Still missing before a real build
+
+1. Verified Mi Band 10 compiler profile and `deviceSource` values.
+2. Confirmation that the target firmware accepts the selected Zepp OS or EasyFace package format.
+3. Final image-widget layout using the migrated TIME FLIES assets.
+4. Simulator or real-device installation test.
+5. AOD and lock-screen behavior verification.
+
+The current project is source scaffolding, not an installable `.bin` release.
