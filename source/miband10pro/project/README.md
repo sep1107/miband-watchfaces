@@ -1,52 +1,60 @@
 # TIME FLIES — Xiaomi Smart Band 10 Pro
 
-## Provisional target
+## 暂定开发目标
 
 ```text
-Canvas: 400 × 480
-Panel specification commonly reported as: 480 × 400
-Screen: 1.74-inch AMOLED
+开发画布：400 × 480
+目标型号：Xiaomi Smart Band 10 Pro
+状态：尚未取得正式 SDK、deviceSource 或真机验证
 ```
 
-The coordinate orientation is provisional. If the final compiler expects `480 × 400`, the constants and layout zones can be transposed without rewriting the sensor logic.
+画布方向和尺寸是当前开发参数，不代表最终设备规格。传感器逻辑与布局常量已经分开，后续确认正式配置后可以调整坐标而不必重写数据读取逻辑。
 
-## Layout zones
+## 布局区域
 
 ```text
 ┌──────────────────────────────────────┐
 │              TIME FLIES              │
 ├──────────────────────┬───────────────┤
-│                      │ date          │
-│      large time      │ steps         │
-│                      │ heart rate    │
-│                      │ battery       │
+│                      │ 日期          │
+│       大号时间       │ 步数          │
+│                      │ 心率          │
+│                      │ 电量          │
 ├──────────────────────┴───────────────┤
-│ festival / solar term / status       │
+│ 节日 / 节气 / 状态                   │
 └──────────────────────────────────────┘
 ```
 
-## Implemented source features
+## 已实现的源码功能
 
-- Current time and date.
-- Step count.
-- Last measured heart rate.
-- Battery percentage.
-- Chinese festival or solar-term text when supported.
-- Sensor event listeners and cleanup.
-- Constants for screen size, margins and column widths.
+- 当前时间与秒数。
+- 当前日期和星期。
+- 步数。
+- 最近一次心率。
+- 电量百分比。
+- 支持时显示中文节日或节气。
+- 传感器事件监听与销毁清理。
+- 集中定义屏幕尺寸、边距和左右栏宽度。
 
-## Asset migration
+## 素材迁移
 
-The original TIME FLIES package uses TGA image data with `.png` filenames. The 10 Pro migration must preserve aspect ratio; direct `192 × 490` to `400 × 480` stretching is not acceptable.
+原 TIME FLIES 包中的图片文件虽然使用 `.png` 扩展名，内容实际是 TGA 图像。当前已经整理 157 个资源，并生成第一版 400 × 480 开发素材：
 
-The helper script in `../tools/prepare_assets.py` supports proportional scaling and background canvas expansion.
+- 主背景：原图等比例缩放后放入 400 × 480 黑色画布，右侧留数据栏。
+- 时间数字：44 × 67 → 64 × 97。
+- 日期数字：12 × 20 → 17 × 28。
+- 天气图标：40 × 40 → 48 × 48。
+- 电量图：40 × 16 → 50 × 20。
 
-## Blocking items
+`../tools/prepare_assets.py` 可以重新生成素材，并允许以后更换目标画布和缩放倍率。
 
-- Verified Smart Band 10 Pro platform/device ID.
-- Verified compiler profile and package format.
-- Simulator or physical-device test.
-- Final safe-area and corner-radius measurements.
-- AOD and lock-screen validation.
+## 仍然缺少
 
-This directory is development source, not an installable release.
+- 可确认的 Smart Band 10 Pro 平台或设备 ID。
+- 可确认的编译器配置与安装包格式。
+- 模拟器或真机安装测试。
+- 最终安全区域和圆角参数。
+- AOD 与锁屏验证。
+- 将生成的图片资源接入最终 `hmUI.widget.IMG` 布局。
+
+当前目录是开发源码，不是可安装 Release。
