@@ -6,11 +6,11 @@
     "appName": "TIME FLIES - Smart Band 10 Pro",
     "appType": "watchface",
     "version": {
-      "code": 3,
-      "name": "0.4.0"
+      "code": 4,
+      "name": "0.5.0"
     },
     "vender": "sep1107",
-    "description": "Provisional TIME FLIES image-layout project with weather for Xiaomi Smart Band 10 Pro"
+    "description": "Validated TIME FLIES source project for Xiaomi Smart Band 10 Pro research"
   },
   "permissions": [],
   "runtime": {
