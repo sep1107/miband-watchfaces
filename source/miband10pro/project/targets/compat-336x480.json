@@ -1,13 +1,23 @@
 {
+  "schemaVersion": 1,
   "id": "compat-336x480",
   "width": 336,
   "height": 480,
   "panelX": 188,
   "panelPadding": 12,
-  "confidence": "medium",
-  "basis": [
-    "Mi Band 9 Pro real-device-tested MiCreate projects use a 336x480 example image",
-    "Mi Band 9 Pro .face metadata identifies MiBand8Pro DeviceVersion 7.1.0",
-    "Smart Band 10 Pro exact profile remains unverified"
+  "status": "reference-build-chain",
+  "evidence": {
+    "hardware": "indirect",
+    "buildChain": "tested",
+    "deviceTarget": "reference-only",
+    "sources": [
+      "Mi Band 9 Pro real-device-tested MiCreate projects use a 336x480 example image",
+      "Mi Band 9 Pro projects build with Mi Band 8 Pro target metadata",
+      "Generated reference metadata identifies MiBand8Pro DeviceVersion 7.1.0"
+    ]
+  },
+  "notes": [
+    "This profile has the strongest known Pro-series build-chain evidence.",
+    "It is not verified for Xiaomi Smart Band 10 Pro."
   ]
 }
