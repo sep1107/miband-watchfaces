@@ -31,13 +31,15 @@ miband-watchfaces/
         ├── micreate-probe/
         ├── reference/
         ├── project/
+        │   ├── PACKAGE_INSPECTION.md
         │   └── targets/
         └── tools/
+            └── inspect_watchface_package.py
 ```
 
 ## Xiaomi Smart Band 10 Pro 开发状态
 
-当前研究版本为 `v0.7.0`。项目对候选目标采用三类独立证据：
+当前研究版本为 `v0.7.1`。项目对候选目标采用三类独立证据：
 
 - 屏幕或画布硬件证据。
 - 编辑器与编译链证据。
@@ -57,6 +59,7 @@ miband-watchfaces/
 - `app.json` 生成器
 - GitHub Actions 自动检查全部候选 profile
 - MiCreate `.fprj` 格式探针
+- 递归表盘包检查器，可读取 ZIP、嵌套 `.zpk`、JSON/XML、PNG/TGA 和设备标识
 
 Smart Band 10 Pro 已于 2026 年 5 月公开发布，但目前仍未获得正式 SDK、已验证的编译目标、原厂表盘包或真机安装结果。因此当前项目是研究与开发源码，不是可安装成品。
 
