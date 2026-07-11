@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply a target canvas profile to the Band 10 Pro research project."""
+"""Apply a validated target canvas profile to the Band 10 Pro research project."""
 
 from __future__ import annotations
 
@@ -8,12 +8,50 @@ import json
 import re
 from pathlib import Path
 
+VALID_STATUS = {
+    "reference-build-chain",
+    "reported-hardware",
+    "verified-build-target",
+}
+
 
 def replace(pattern: str, replacement: str, text: str, label: str) -> str:
     updated, count = re.subn(pattern, replacement, text, count=1)
     if count != 1:
         raise RuntimeError(f"Could not update {label}")
     return updated
+
+
+def validate_profile(profile: dict) -> tuple[int, int, int, int, str]:
+    required = ("schemaVersion", "id", "width", "height", "panelX", "panelPadding", "status", "evidence")
+    missing = [key for key in required if key not in profile]
+    if missing:
+        raise ValueError("Missing profile fields: " + ", ".join(missing))
+    if profile["schemaVersion"] != 1:
+        raise ValueError("Unsupported profile schemaVersion")
+
+    width = int(profile["width"])
+    height = int(profile["height"])
+    panel_x = int(profile["panelX"])
+    padding = int(profile["panelPadding"])
+    profile_id = str(profile["id"])
+    status = str(profile["status"])
+
+    if width <= 0 or height <= 0:
+        raise ValueError("Canvas dimensions must be positive")
+    if panel_x <= 0 or panel_x >= width:
+        raise ValueError("panelX must be inside the canvas")
+    if padding < 0:
+        raise ValueError("panelPadding cannot be negative")
+    content_width = width - panel_x - padding - 8
+    if content_width < 80:
+        raise ValueError(f"Panel content width is too small: {content_width}px")
+    if status not in VALID_STATUS:
+        raise ValueError(f"Unknown profile status: {status}")
+    if not isinstance(profile["evidence"], dict):
+        raise ValueError("evidence must be an object")
+
+    return width, height, panel_x, padding, profile_id
 
 
 def main() -> int:
@@ -24,11 +62,7 @@ def main() -> int:
 
     project = args.project.resolve()
     profile = json.loads(args.profile.read_text(encoding="utf-8"))
-    width = int(profile["width"])
-    height = int(profile["height"])
-    panel_x = int(profile["panelX"])
-    padding = int(profile["panelPadding"])
-    profile_id = str(profile["id"])
+    width, height, panel_x, padding, profile_id = validate_profile(profile)
 
     index_path = project / "device/watchface/default-target/index.js"
     text = index_path.read_text(encoding="utf-8")
@@ -93,12 +127,23 @@ def main() -> int:
     notes = config.setdefault("notes", {})
     notes["primaryTargetProfile"] = profile_id
     notes["primaryCanvas"] = f"{width}x{height}"
+    notes["targetProfileStatus"] = profile["status"]
+    evidence = profile["evidence"]
+    notes["targetHardwareEvidence"] = evidence.get("hardware", "none")
+    notes["targetBuildChainEvidence"] = evidence.get("buildChain", "none")
+    notes["targetDeviceEvidence"] = evidence.get("deviceTarget", "unverified")
     config_path.write_text(
         json.dumps(config, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 
     print(f"Applied {profile_id}: {width}x{height}")
+    print(f"Profile status: {profile['status']}")
+    print(
+        "Evidence: hardware={hardware}, build={buildChain}, target={deviceTarget}".format(
+            **evidence
+        )
+    )
     return 0
 
 
