@@ -56,6 +56,8 @@ jobs:
           source/miband10pro/tools/test_p67_minimal_builder.py
           source/miband10pro/tools/p67_probe_package.py
           source/miband10pro/tools/test_p67_probe_package.py
+          source/miband10pro/tools/p67_transfer_protocol.py
+          source/miband10pro/tools/test_p67_transfer_protocol.py
 
       - name: Validate source checkout
         run: >-
@@ -117,6 +119,10 @@ jobs:
         run: >-
           python source/miband10pro/tools/test_p67_minimal_builder.py
 
+      - name: Test P67 direct transfer framing
+        run: >-
+          python source/miband10pro/tools/test_p67_transfer_protocol.py
+
       - name: Generate and re-inspect minimal P67 resource.bin
         run: |
           python source/miband10pro/tools/p67_minimal_builder.py \
@@ -125,6 +131,11 @@ jobs:
             /tmp/p67-minimal-resource.bin \
             --json /tmp/p67-minimal-report.json \
             --markdown /tmp/p67-minimal-report.md
+          python source/miband10pro/tools/p67_transfer_protocol.py \
+            /tmp/p67-minimal-resource.bin \
+            --chunk-size 2048 \
+            --out-dir /tmp/p67-upload-plan \
+            > /tmp/p67-upload-plan.json
           python - <<'PY'
           import json
           from pathlib import Path
@@ -136,7 +147,12 @@ jobs:
           assert report['recordTypeCounts'] == {'image': 1, 'layout': 1}
           assert report['validation']['errors'] == []
           assert Path('/tmp/p67-minimal-resource.bin').stat().st_size % 4 == 0
-          print('Generated minimal P67 resource passed reverse inspection')
+          upload = json.loads(Path('/tmp/p67-upload-plan.json').read_text(encoding='utf-8'))
+          assert upload['watchface']['packageId'] == report['header']['packageId']
+          assert upload['protocol']['uploadType'] == 16
+          assert upload['protocol']['chunkCount'] > 0
+          assert Path('/tmp/p67-upload-plan/upload-payload.bin').is_file()
+          print('Generated minimal P67 resource and upload plan passed inspection')
           PY
           test -s /tmp/p67-minimal-report.md
 
