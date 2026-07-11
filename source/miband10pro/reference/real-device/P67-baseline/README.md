@@ -37,4 +37,23 @@ Its `resource.bin` had SHA-256:
 a3c1f2e59346117b2885bd06a36a358b525aeaa70ecad8c7e51bf6ac00fc9669
 ```
 
-The package proves the official target and canvas. It does not yet prove that a custom-generated BIN is accepted by the device.
+## Derived binary structure
+
+The uncommitted real binary was inspected locally with `tools/inspect_p67_binary.py`. The sanitized summary records:
+
+```text
+Header: 168 bytes
+Theme core: 88 bytes
+P67 theme extension: 88 bytes
+Theme entry: 176 bytes
+RecordBase: 16 bytes
+Record area: offset 696
+Raw-data area: offset 4344
+Themes: 3
+Records: 228
+Structural validation errors: 0
+```
+
+The three extension records contain the style names `样式1`, `样式2` and `样式3`. Record types and payload ranges were checked against the full binary without storing the binary or artwork in GitHub.
+
+The package proves the official target, canvas and high-level binary table layout. It does not yet prove that a custom-generated BIN is accepted by the device.
