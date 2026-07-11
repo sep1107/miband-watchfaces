@@ -13,71 +13,49 @@
 | --- | --- |
 | `miband7.bin` | 小米手环 7 NFC 原始表盘 |
 
+## Xiaomi Smart Band 10 Pro 开发状态
+
+当前研究版本为 **v0.8.0**。真实设备和 Mi Fitness 表盘缓存已经确认官方目标：
+
+```text
+设备型号：M2551B1
+系统：Xiaomi HyperOS 3.101.030
+表盘目标：P67
+Watch OS：vela
+画布：336×480
+分辨率代号：XMHD03
+包类型：BIN
+能力协议：1.9.4
+图片格式：indexed8
+压缩：RLEReversed
+```
+
+项目已加入：
+
+- 脱敏的 P67 真机包基准；
+- `p67-336x480` 正式目标 profile；
+- P67 profile 提取器；
+- `resource.bin` 头部解析；
+- target schema、profile 校验和遗留画布检查；
+- GitHub Actions 自动重建并核对 P67 profile。
+
+官方包目标已经验证，但自制 BIN 的真机安装仍未验证。当前重点是复现 `manifest.xml + indexed8/RLEReversed 资源 -> resource.bin` 的生成链。
+
 ## 仓库结构
 
 ```text
-miband-watchfaces/
-├── README.md
-├── .github/workflows/
-│   ├── validate-watchface.yml
-│   └── validate-band10pro.yml
-└── source/
-    ├── README.md
-    ├── app.json
-    ├── app.bin
-    └── miband10pro/
-        ├── README.md
-        ├── MICREATE_FORMAT.md
-        ├── micreate-probe/
-        ├── reference/
-        │   └── real-device/
-        │       └── M2551B1.json
-        ├── project/
-        │   ├── PACKAGE_INSPECTION.md
-        │   └── targets/
-        └── tools/
-            └── inspect_watchface_package.py
+source/miband10pro/
+├── reference/real-device/
+│   ├── M2551B1.json
+│   └── P67-baseline/
+├── project/
+│   ├── REAL_DEVICE_PACKAGE.md
+│   └── targets/p67-336x480.json
+└── tools/
+    ├── extract_p67_profile.py
+    ├── validate_target_profiles.py
+    └── check_no_legacy_canvas.py
 ```
-
-## Xiaomi Smart Band 10 Pro 开发状态
-
-当前研究版本为 `v0.7.2`。用户提供的实机照片已经确认：
-
-```text
-设备：小米手环10 Pro
-型号：M2551B1
-系统：Xiaomi HyperOS
-OS 版本：3.101.030
-```
-
-原始照片不提交到仓库，只保存非敏感设备事实。
-
-项目对候选目标采用三类独立证据：
-
-- 屏幕或画布硬件证据。
-- 编辑器与编译链证据。
-- Smart Band 10 Pro 真机目标证据。
-
-当前候选：
-
-- `compat-336x480`：Mi Band 8/9 Pro 的 MiCreate 构建链参考更强，实机屏幕比例也提供视觉支持，但不是 10 Pro 安装证明。
-- `experimental-400x480`：对应发布前报道的面板参数，但没有公开编译器目标或包元数据。
-
-目前源码已实现图片时间、日期、星期、天气、步数、心率、电量和节日信息，并加入：
-
-- target profile schema
-- profile 几何与证据校验
-- 目标配置切换
-- 项目与资源校验
-- `app.json` 生成器
-- GitHub Actions 自动检查全部候选 profile
-- MiCreate `.fprj` 格式探针
-- 递归表盘包检查器，可读取 ZIP、嵌套 `.zpk`、JSON/XML、PNG/TGA 和设备标识
-- 真实设备记录 `M2551B1.json`
-
-下一关键步骤是从这台实机配套的 Mi Fitness 中取得一个原厂或第三方表盘包。拿到后即可检查真实画布、`deviceSource`、`DeviceType` 和包格式。
-
-当前项目仍是研究与开发源码，不是可安装成品。
 
 ## 文件信息
 
