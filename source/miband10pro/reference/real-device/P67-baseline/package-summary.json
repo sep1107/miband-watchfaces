@@ -7,6 +7,27 @@
   "resourceBinSize": 250850,
   "resourceBinMagic": "0x1234A55A",
   "resourceBinEmbeddedPackageId": "120917384229",
+  "binaryStructure": {
+    "headerSize": 168,
+    "themeCoreSize": 88,
+    "themeExtensionSize": 88,
+    "themeSize": 176,
+    "recordSize": 16,
+    "recordAreaStart": 696,
+    "rawDataStart": 4344,
+    "recordCount": 228,
+    "themeStyleNames": ["样式1", "样式2", "样式3"],
+    "recordTypeCounts": {
+      "layout": 60,
+      "image": 45,
+      "imageArray": 27,
+      "translation": 9,
+      "data": 48,
+      "slot": 3,
+      "widget": 36
+    },
+    "structuralValidationErrors": 0
+  },
   "manifestTagCounts": {
     "Watchface": 1,
     "Resources": 1,
@@ -22,5 +43,5 @@
     "Theme": 3,
     "Layout": 60
   },
-  "privacy": "No account, Bluetooth address, serial number, photo, or log data is stored."
+  "privacy": "No account, Bluetooth address, serial number, photo, artwork, original resource.bin, or log data is stored."
 }
