@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "p67-336x480",
+  "width": 336,
+  "height": 480,
+  "panelX": 188,
+  "panelPadding": 12,
+  "status": "verified-official-package",
+  "platform": {
+    "deviceModel": "M2551B1",
+    "deviceType": "P67",
+    "watchOS": "vela",
+    "protocol": "1.9.4",
+    "resolutionCode": "XMHD03",
+    "packet": "BIN",
+    "region": "CN",
+    "imageFormat": "indexed8",
+    "imageCompression": true,
+    "compressMethod": "RLEReversed"
+  },
+  "evidence": {
+    "hardware": "official",
+    "buildChain": "reference",
+    "deviceTarget": "official-package-verified",
+    "sources": [
+      "Mi Fitness cache package exported from a real M2551B1 device pairing",
+      "description.xml: deviceType=P67, size=336x480, watchOS=vela",
+      "capability.json: resolution=XMHD03, packet=BIN, protocol=1.9.4",
+      "manifest.xml: width=336, height=480, compressMethod=RLEReversed"
+    ]
+  },
+  "artifact": {
+    "packageName": "120917384229",
+    "watchfaceVersion": "1.0.12",
+    "packageSha256": "e607efbaa564ff88a248374c1b19261debca974c6a39993cc8c4d06c222a2049",
+    "resourceBinSha256": "a3c1f2e59346117b2885bd06a36a358b525aeaa70ecad8c7e51bf6ac00fc9669",
+    "resourceBinMagic": "0x1234A55A",
+    "themeCount": 3,
+    "editable": true
+  },
+  "notes": [
+    "This profile verifies the official package target and canvas on a real Smart Band 10 Pro.",
+    "It does not yet verify that a custom-built package is accepted by the device.",
+    "The legacy Zepp OS app.json project is retained only as a layout prototype."
+  ]
+}
