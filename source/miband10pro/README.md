@@ -2,9 +2,9 @@
 
 本目录用于开发 TIME FLIES 的 Xiaomi Smart Band 10 Pro 版本。
 
-## v0.7.0 目标策略
+## v0.7.1 目标策略
 
-项目保留两个候选配置，但分别衡量硬件、构建链和真机目标证据：
+项目保留两个候选配置，并分别衡量硬件、构建链和真机目标证据：
 
 ```text
 构建链参考：compat-336x480
@@ -24,22 +24,21 @@ miband10pro/
 ├── micreate-probe/
 ├── reference/
 │   ├── amazfit-band7/
-│   └── mi-band-9-pro/
+│   ├── mi-band-9-pro/
+│   └── original-band7/
 ├── project/
 │   ├── README.md
 │   ├── COMPILER_RESEARCH.md
 │   ├── TARGET_RESEARCH.md
+│   ├── PACKAGE_INSPECTION.md
 │   ├── required-assets.json
 │   ├── targets/
-│   │   ├── README.md
-│   │   ├── profile.schema.json
-│   │   ├── compat-336x480.json
-│   │   └── experimental-400x480.json
 │   └── device/
 └── tools/
     ├── prepare_assets.py
     ├── validate_project.py
     ├── validate_target_profiles.py
+    ├── inspect_watchface_package.py
     ├── build_app_json.py
     ├── build_micreate_probe.py
     └── apply_target_profile.py
@@ -52,5 +51,7 @@ miband10pro/
 - 已加入 target profile schema、证据分层和几何校验。
 - GitHub Actions 会逐个应用所有候选 profile 并运行项目校验。
 - 已提供 MiCreate `.fprj` 格式探针。
+- 已加入递归表盘包检查器，可识别嵌套 ZIP、JSON/XML、PNG/TGA 和设备元数据。
+- 原 TIME FLIES 与 Amazfit Band 7 参考包已经生成基准检查结论。
 - 尚未获得可确认的 10 Pro `deviceSource`、正式编译配置、原厂表盘包或真机测试。
 - 当前项目还不是可安装成品。
