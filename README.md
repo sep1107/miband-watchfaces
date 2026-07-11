@@ -29,37 +29,36 @@ miband-watchfaces/
         ├── README.md
         ├── MICREATE_FORMAT.md
         ├── micreate-probe/
-        │   └── TimeFlies_ProProbe.fprj
         ├── reference/
-        │   ├── amazfit-band7/
-        │   └── mi-band-9-pro/
         ├── project/
         │   └── targets/
         └── tools/
-            ├── validate_project.py
-            ├── apply_target_profile.py
-            ├── build_app_json.py
-            └── build_micreate_probe.py
 ```
 
 ## Xiaomi Smart Band 10 Pro 开发状态
 
-当前研究版本为 `v0.6.1`，采用双目标配置：
+当前研究版本为 `v0.7.0`。项目对候选目标采用三类独立证据：
 
-- `compat-336x480`：主要兼容候选，依据是真机验证过的 Mi Band 9 Pro MiCreate 工程。
-- `experimental-400x480`：保留用于对比尚未验证的宽屏参数。
+- 屏幕或画布硬件证据。
+- 编辑器与编译链证据。
+- Smart Band 10 Pro 真机目标证据。
+
+当前候选：
+
+- `compat-336x480`：Mi Band 8/9 Pro 的 MiCreate 构建链参考更强，但不是 10 Pro 真机证明。
+- `experimental-400x480`：与当前 10 Pro 宽屏报道更接近，但没有公开编译器目标或包元数据。
 
 目前源码已实现图片时间、日期、星期、天气、步数、心率、电量和节日信息，并加入：
 
+- target profile schema
+- profile 几何与证据校验
 - 目标配置切换
 - 项目与资源校验
 - `app.json` 生成器
-- GitHub Actions 自动检查
+- GitHub Actions 自动检查全部候选 profile
 - MiCreate `.fprj` 格式探针
 
-MiCreate 探针使用 `DeviceType="11"` 作为 Mi Band 8/9 Pro 格式参考，包含 16 个控件和独立的 69 张图片包；这个值尚未验证适用于 Smart Band 10 Pro。
-
-> 仍未获得 Smart Band 10 Pro 的正式 SDK、已验证目标配置、官方表盘包或真机测试，因此当前项目是研究与开发源码，不是可安装成品。
+Smart Band 10 Pro 已于 2026 年 5 月公开发布，但目前仍未获得正式 SDK、已验证的编译目标、原厂表盘包或真机安装结果。因此当前项目是研究与开发源码，不是可安装成品。
 
 ## 文件信息
 
