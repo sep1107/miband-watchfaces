@@ -1,21 +1,16 @@
 # Target profiles
 
-Target profiles control canvas geometry only. They do not prove firmware compatibility.
+The Smart Band 10 Pro workspace uses one verified official-package target:
 
-## Evidence fields
-
-Every profile separates:
-
-- `evidence.hardware`: confidence in the physical screen/canvas.
-- `evidence.buildChain`: confidence in a related compiler or editor path.
-- `evidence.deviceTarget`: confidence that Smart Band 10 Pro accepts the output.
-
-## Profiles
-
-| Profile | Canvas | Status | Hardware | Build chain | 10 Pro target |
+| Profile | Canvas | Device type | Watch OS | Packet | Status |
 | --- | --- | --- | --- | --- | --- |
-| `compat-336x480` | 336×480 | reference build chain | indirect | tested on related Pro devices | reference only |
-| `experimental-400x480` | 400×480 | reported hardware | reported | none | unverified |
+| `p67-336x480` | 336×480 | `P67` | `vela` | `BIN` | official package verified |
+
+`compat-336x480` is retained only as a historical Mi Band 8/9 Pro build-chain reference. It is not an active Smart Band 10 Pro compiler target.
+
+## Evidence boundary
+
+The official package proves the target metadata and canvas. It does not yet prove that a newly generated custom BIN will be accepted by the physical device.
 
 ## Commands
 
@@ -25,17 +20,18 @@ Validate all profiles:
 python ../../tools/validate_target_profiles.py .
 ```
 
-Apply one profile to the project:
+Rebuild the verified profile from the sanitized Mi Fitness fixture:
 
 ```bash
-python ../../tools/apply_target_profile.py .. compat-336x480.json
-python ../../tools/apply_target_profile.py .. experimental-400x480.json
+python ../../tools/extract_p67_profile.py \
+  ../../reference/real-device/P67-baseline \
+  --profile-out /tmp/p67-336x480.json \
+  --report-json /tmp/p67-report.json \
+  --report-markdown /tmp/p67-report.md
 ```
 
-After applying a profile, run:
+Apply the verified geometry to the legacy visual prototype:
 
 ```bash
-python ../../tools/validate_project.py ..
+python ../../tools/apply_target_profile.py .. p67-336x480.json
 ```
-
-A profile may only use `status: verified-build-target` after a reproducible build and Smart Band 10 Pro installation are confirmed.
