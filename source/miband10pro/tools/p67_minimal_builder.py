@@ -136,7 +136,9 @@ def build_resource(
         + extension
     )
 
-    image_uid = make_uid(2, 0)
+    # The real P67 package reserves manifest Image1 for the preview image. It is
+    # not a RecordBase entry, so the first drawable image is Image2 / 0x02000001.
+    image_uid = make_uid(2, 1)
     records = (
         struct.pack("<IIII", make_uid(0, 0), 0, layout_payload_addr, 16)
         + struct.pack("<IIII", image_uid, 0, image_payload_addr, len(image))
