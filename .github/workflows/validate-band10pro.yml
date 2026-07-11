@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - 'source/miband10pro/**'
+      - 'source/app.json'
+      - 'source/app.bin'
       - '.github/workflows/validate-band10pro.yml'
   pull_request:
     paths:
       - 'source/miband10pro/**'
+      - 'source/app.json'
+      - 'source/app.bin'
       - '.github/workflows/validate-band10pro.yml'
 
 jobs:
@@ -37,6 +41,7 @@ jobs:
           python -m py_compile
           source/miband10pro/tools/validate_project.py
           source/miband10pro/tools/validate_target_profiles.py
+          source/miband10pro/tools/inspect_watchface_package.py
           source/miband10pro/tools/build_app_json.py
           source/miband10pro/tools/apply_target_profile.py
           source/miband10pro/tools/build_micreate_probe.py
@@ -65,6 +70,15 @@ jobs:
             --device-source 11 \
             --design-width 336
           python -m json.tool /tmp/app.json >/dev/null
+
+      - name: Smoke-test package inspector
+        run: |
+          python source/miband10pro/tools/inspect_watchface_package.py \
+            source/app.json \
+            --json /tmp/app-inspection.json \
+            --markdown /tmp/app-inspection.md
+          python -m json.tool /tmp/app-inspection.json >/dev/null
+          test -s /tmp/app-inspection.md
 
       - name: Parse MiCreate format probe
         run: |
