@@ -2,22 +2,26 @@
 
 本目录用于开发 TIME FLIES 的 Xiaomi Smart Band 10 Pro 版本。
 
-## v0.6.0 目标策略
+## v0.7.0 目标策略
 
-项目提供两个可切换目标：
+项目保留两个候选配置，但分别衡量硬件、构建链和真机目标证据：
 
 ```text
-主要候选：compat-336x480
-实验候选：experimental-400x480
+构建链参考：compat-336x480
+硬件布局候选：experimental-400x480
 ```
 
-`336 × 480` 的依据来自公开的 Mi Band 9 Pro 真机验证项目：作者使用 MiCreate `.fprj` 工程、`336 × 480` 示例图和 Mi Band 8 Pro 目标生成 `.face` 文件，并在 Mi Band 9 Pro 上测试。它不能直接证明 10 Pro 一定兼容，但比单纯媒体规格更接近真实 Pro 表盘工具链。
+- `compat-336x480` 基于公开的 Mi Band 9 Pro 真机验证 MiCreate 工程，构建链证据更强。
+- `experimental-400x480` 对应 10 Pro 发布后仍被报道的宽屏方向，但没有公开编译目标。
+- 两者都尚未通过 Smart Band 10 Pro 真机安装验证。
 
 ## 目录
 
 ```text
 miband10pro/
 ├── README.md
+├── MICREATE_FORMAT.md
+├── micreate-probe/
 ├── reference/
 │   ├── amazfit-band7/
 │   └── mi-band-9-pro/
@@ -27,19 +31,26 @@ miband10pro/
 │   ├── TARGET_RESEARCH.md
 │   ├── required-assets.json
 │   ├── targets/
+│   │   ├── README.md
+│   │   ├── profile.schema.json
+│   │   ├── compat-336x480.json
+│   │   └── experimental-400x480.json
 │   └── device/
 └── tools/
     ├── prepare_assets.py
     ├── validate_project.py
+    ├── validate_target_profiles.py
     ├── build_app_json.py
+    ├── build_micreate_probe.py
     └── apply_target_profile.py
 ```
 
 ## 当前状态
 
-- 默认开发画布已切换为 `336 × 480`。
-- 保留 `400 × 480` 实验配置，可一条命令切换。
 - 已接入图片时间、日期、星期、天气、步数、心率、电量与节日。
 - 已整理并验证 157 个 RGBA PNG 资源。
-- 尚未获得可确认的 10 Pro `deviceSource`、官方编译配置或真机测试。
+- 已加入 target profile schema、证据分层和几何校验。
+- GitHub Actions 会逐个应用所有候选 profile 并运行项目校验。
+- 已提供 MiCreate `.fprj` 格式探针。
+- 尚未获得可确认的 10 Pro `deviceSource`、正式编译配置、原厂表盘包或真机测试。
 - 当前项目还不是可安装成品。
