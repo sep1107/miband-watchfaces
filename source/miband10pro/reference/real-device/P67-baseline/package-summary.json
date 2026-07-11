@@ -1,0 +1,26 @@
+{
+  "sourceType": "user-provided Mi Fitness cache export from M2551B1 pairing",
+  "packageSha256": "e607efbaa564ff88a248374c1b19261debca974c6a39993cc8c4d06c222a2049",
+  "packageSize": 336307,
+  "archiveEntryCount": 55,
+  "resourceBinSha256": "a3c1f2e59346117b2885bd06a36a358b525aeaa70ecad8c7e51bf6ac00fc9669",
+  "resourceBinSize": 250850,
+  "resourceBinMagic": "0x1234A55A",
+  "resourceBinEmbeddedPackageId": "120917384229",
+  "manifestTagCounts": {
+    "Watchface": 1,
+    "Resources": 1,
+    "Translation": 4,
+    "Item": 40,
+    "Image": 157,
+    "ImageArray": 12,
+    "DataItemImageNumber": 17,
+    "DataItemImageValues": 4,
+    "Param": 36,
+    "Widget": 16,
+    "Slot": 2,
+    "Theme": 3,
+    "Layout": 60
+  },
+  "privacy": "No account, Bluetooth address, serial number, photo, or log data is stored."
+}
