@@ -6,11 +6,11 @@
     "appName": "TIME FLIES - Smart Band 10 Pro",
     "appType": "watchface",
     "version": {
-      "code": 8,
-      "name": "0.7.1"
+      "code": 9,
+      "name": "0.7.2"
     },
     "vender": "sep1107",
-    "description": "Evidence-classified TIME FLIES research project with recursive package inspection for Xiaomi Smart Band 10 Pro"
+    "description": "Evidence-classified TIME FLIES research project with verified M2551B1 real-device metadata"
   },
   "permissions": [],
   "runtime": {
@@ -36,13 +36,15 @@
     "primaryTargetProfile": "compat-336x480",
     "primaryCanvas": "336x480",
     "targetProfileStatus": "reference-build-chain",
-    "targetHardwareEvidence": "indirect",
-    "targetBuildChainEvidence": "tested",
-    "targetDeviceEvidence": "reference-only",
+    "targetHardwareEvidence": "indirect-with-real-device-visual-support",
+    "targetBuildChainEvidence": "tested-on-related-pro-devices",
+    "targetDeviceEvidence": "real-device-identity-verified-package-target-unverified",
+    "verifiedDeviceModel": "M2551B1",
+    "verifiedDeviceOS": "Xiaomi HyperOS 3.101.030",
     "alternateTargetProfile": "experimental-400x480",
     "alternateCanvas": "400x480",
-    "deviceSource": "TODO: verify with an official or proven Smart Band 10 Pro compiler profile",
-    "packageFormat": "TODO: inspect a real Smart Band 10 Pro package",
-    "status": "validated research source with package inspector; not installable"
+    "deviceSource": "TODO: extract from a real Smart Band 10 Pro package",
+    "packageFormat": "TODO: inspect a stock or Mi Fitness cached watchface",
+    "status": "validated research source; physical device verified; custom package not yet installable"
   }
 }
