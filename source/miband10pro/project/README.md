@@ -1,13 +1,25 @@
 # TIME FLIES — Xiaomi Smart Band 10 Pro research project
 
-## v0.6.1 目标配置
+## v0.7.0：目标证据分层
 
-项目提供两个候选目标配置：
+项目继续保留两个候选画布，但从本版本开始，不再把“屏幕规格”和“可编译兼容性”混为一谈。
 
-- **主要候选：`compat-336x480`** — 基于已在 Mi Band 9 Pro 真机测试的 MiCreate 工程。
-- **实验候选：`experimental-400x480`** — 保留用于对比部分媒体报道中的 `480 × 400` 面板说法。
+每个 target profile 分别记录：
 
-在获得真实 Smart Band 10 Pro 表盘包、编译目标或设备元数据前，两者都不声称是最终兼容配置。
+- `hardware`：屏幕或画布证据。
+- `buildChain`：编辑器或编译链证据。
+- `deviceTarget`：Smart Band 10 Pro 是否接受生成包的证据。
+
+只有 `deviceTarget: verified` 的配置，才能称为已验证的 10 Pro 构建目标。
+
+## 当前候选配置
+
+| Profile | Canvas | 主要价值 | 关键限制 |
+| --- | --- | --- | --- |
+| `compat-336x480` | 336×480 | Mi Band 8/9 Pro 的 MiCreate 构建链已有真机参考 | 没有 10 Pro 安装验证 |
+| `experimental-400x480` | 400×480 | 10 Pro 已正式发布；发布前资料报告面板为 480×400 | 没有公开编译器目标或包元数据 |
+
+默认仍使用 `compat-336x480`，因为它拥有更强的构建链证据；`experimental-400x480` 是当前更强的硬件布局候选。
 
 ## 当前功能
 
@@ -19,71 +31,63 @@
 - 157 个经过验证的 RGBA PNG 素材。
 - 项目校验器、`app.json` 生成器和目标配置切换器。
 - MiCreate `.fprj` 格式探针与生成器。
-- GitHub Actions 自动语法和结构检查。
+- GitHub Actions 自动语法、结构和 target profile 检查。
 
-## 切换目标配置
+## Profile schema
+
+```text
+targets/
+├── README.md
+├── profile.schema.json
+├── compat-336x480.json
+└── experimental-400x480.json
+```
+
+校验所有候选配置：
+
+```bash
+python tools/validate_target_profiles.py targets
+```
+
+切换目标配置：
 
 ```bash
 python tools/apply_target_profile.py . targets/compat-336x480.json
 python tools/apply_target_profile.py . targets/experimental-400x480.json
 ```
 
-切换后运行：
+应用后运行：
 
 ```bash
 python tools/validate_project.py .
 ```
 
-## MiCreate Pro 格式探针
+应用脚本会拒绝以下配置：
 
-仓库新增：
+- 非法或负数画布。
+- `panelX` 超出屏幕。
+- 右侧数据栏有效宽度小于 80px。
+- 未知的 profile 状态。
+- 缺失证据字段的旧格式配置。
 
-```text
-source/miband10pro/
-├── micreate-probe/
-│   └── TimeFlies_ProProbe.fprj
-├── MICREATE_FORMAT.md
-└── tools/build_micreate_probe.py
-```
+## v0.7.0 实际校验
 
-探针使用从真机测试的 Mi Band 8/9 Pro 工程中观察到的 `DeviceType="11"`，包含 16 个控件：背景、图片时间、日期、星期、天气、步数、心率和电量。
+- 两个 profile 均通过 schema 和几何校验。
+- `compat-336x480` 的右栏有效内容宽度为 128px。
+- `experimental-400x480` 的右栏有效内容宽度为 172px。
+- 两个 profile 均能在临时工程中应用，并正确更新 JS 常量、`app.js` 和 `app.json.example`。
+- GitHub Actions 会逐个切换所有候选 profile 后运行项目校验。
 
-该值只是 Pro 格式参考，**尚未验证适用于 Smart Band 10 Pro**。生成器要求显式传入：
+## 当前最强证据
 
-```bash
-python tools/build_micreate_probe.py \
-  project/device/assets \
-  micreate-probe \
-  --accept-reference-device-type
-```
+Smart Band 10 Pro 已于 2026 年 5 月公开发布，公开发布报道一致提到 1.74 英寸 AMOLED 屏幕；`480 × 400` 仍主要来自发布前报道。当前仍没有公开的 EasyFace/MiCreate 10 Pro 目标、`deviceSource`、原厂表盘包或已复现的真机安装结果。
 
-生成器会自动创建天气负号 PNG，不再依赖额外素材；电量图片使用 0%、10%……90% 阈值。
-
-完整探针图片包：`time-flies-micreate-probe-v0.2.zip`
-
-- 69 张 PNG
-- 336 × 480 预览图
-- SHA-256：`7a5735e3bcf22ee5cc73832b0f22868712465a68b881a24a7364554da7f101a5`
-
-## 为什么主要候选改为 336 × 480
-
-找到的公开 Mi Band 9 Pro 真机项目使用 MiCreate `.fprj` 工程、`336 × 480` 示例图和 Mi Band 8 Pro 目标元数据生成 `.face` 文件。由于 9 Pro 与 10 Pro 都属于宽屏 Pro 产品路线，这是一条比媒体规格更接近真实表盘开发链的参考，但仍不能代替 10 Pro 真机验证。
-
-更多证据见：
+详细证据见：
 
 - `TARGET_RESEARCH.md`
-- `reference/mi-band-9-pro/`
 - `COMPILER_RESEARCH.md`
 - `MICREATE_FORMAT.md`
-
-## v0.6.1 校验
-
-- 默认 `compat-336x480` 配置通过 JavaScript 和项目校验。
-- `experimental-400x480` 配置通过切换和项目校验。
-- 运行时必需的 57 个素材通过验证。
-- 完整开发包中的 157 个 PNG 全部通过格式验证。
-- MiCreate 探针 XML 可重新解析，16 个控件的 69 张图片引用均存在。
-- GitHub 工作流会检查 JavaScript、Python 工具、配置生成和探针 XML。
+- `reference/mi-band-9-pro/`
 
 ## 当前状态
 
