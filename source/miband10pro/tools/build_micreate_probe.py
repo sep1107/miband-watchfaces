@@ -8,8 +8,11 @@ It is a format reference only and is not verified for Smart Band 10 Pro.
 from __future__ import annotations
 
 import argparse
+import binascii
 import shutil
+import struct
 import xml.etree.ElementTree as ET
+import zlib
 from pathlib import Path
 
 SOURCES = {
@@ -40,7 +43,46 @@ def indexed_list(prefix: str, count: int, step: int = 1) -> str:
     )
 
 
-def add_static(screen: ET.Element, name: str, bitmap: str, x: int, y: int, width: int, height: int) -> None:
+def png_chunk(kind: bytes, data: bytes) -> bytes:
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(
+        ">I", binascii.crc32(kind + data) & 0xFFFFFFFF
+    )
+
+
+def write_minus_png(path: Path, width: int = 17, height: int = 28) -> None:
+    """Write a transparent RGBA minus sign using only the standard library."""
+    rows = []
+    y0 = height // 2 - 1
+    y1 = y0 + 3
+    x0 = 3
+    x1 = width - 3
+    for y in range(height):
+        row = bytearray([0])
+        for x in range(width):
+            if x0 <= x < x1 and y0 <= y < y1:
+                row.extend((255, 255, 255, 255))
+            else:
+                row.extend((0, 0, 0, 0))
+        rows.append(bytes(row))
+    raw = b"".join(rows)
+    png = (
+        b"\x89PNG\r\n\x1a\n"
+        + png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+        + png_chunk(b"IDAT", zlib.compress(raw, 9))
+        + png_chunk(b"IEND", b"")
+    )
+    path.write_bytes(png)
+
+
+def add_static(
+    screen: ET.Element,
+    name: str,
+    bitmap: str,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+) -> None:
     ET.SubElement(screen, "Widget", {
         "Shape": "30", "Name": name, "Bitmap": bitmap,
         "X": str(x), "Y": str(y), "Width": str(width), "Height": str(height),
@@ -48,7 +90,17 @@ def add_static(screen: ET.Element, name: str, bitmap: str, x: int, y: int, width
     })
 
 
-def add_number(screen: ET.Element, name: str, bitmaps: str, x: int, y: int, source: str, digits: int, spacing: int = 0, blanking: int = 0) -> None:
+def add_number(
+    screen: ET.Element,
+    name: str,
+    bitmaps: str,
+    x: int,
+    y: int,
+    source: str,
+    digits: int,
+    spacing: int = 0,
+    blanking: int = 0,
+) -> None:
     ET.SubElement(screen, "Widget", {
         "Shape": "32", "Name": name, "BitmapList": bitmaps,
         "X": str(x), "Y": str(y), "Width": "64", "Height": "97",
@@ -58,7 +110,14 @@ def add_number(screen: ET.Element, name: str, bitmaps: str, x: int, y: int, sour
     })
 
 
-def add_indexed(screen: ET.Element, name: str, bitmaps: str, x: int, y: int, source: str) -> None:
+def add_indexed(
+    screen: ET.Element,
+    name: str,
+    bitmaps: str,
+    x: int,
+    y: int,
+    source: str,
+) -> None:
     ET.SubElement(screen, "Widget", {
         "Shape": "31", "Name": name, "BitmapList": bitmaps,
         "X": str(x), "Y": str(y), "Width": "48", "Height": "48",
@@ -81,19 +140,27 @@ def copy_assets(source: Path, output: Path) -> None:
         files.append((source / f"week/{index}.png", f"week_{index - 1}.png"))
     for index in range(29):
         files.append((source / f"weather/{index}.png", f"weather_{index}.png"))
-    files.append((source / "weather/negative.png", "minus.png"))
 
     missing = [str(path) for path, _ in files if not path.is_file()]
     if missing:
         raise FileNotFoundError("Missing source assets:\n" + "\n".join(missing))
     for path, name in files:
         shutil.copy2(path, output / name)
+    write_minus_png(output / "minus.png")
 
 
 def build(device_type: int, project_id: int, title: str) -> ET.ElementTree:
-    root = ET.Element("FaceProject", {"DeviceType": str(device_type), "Id": str(project_id)})
-    root.append(ET.Comment("DeviceType 11 is an 8/9 Pro reference, not verified for Smart Band 10 Pro."))
-    screen = ET.SubElement(root, "Screen", {"Title": title, "Bitmap": "example.png"})
+    root = ET.Element("FaceProject", {
+        "DeviceType": str(device_type),
+        "Id": str(project_id),
+    })
+    root.append(ET.Comment(
+        "DeviceType 11 is an 8/9 Pro reference, not verified for Smart Band 10 Pro."
+    ))
+    screen = ET.SubElement(root, "Screen", {
+        "Title": title,
+        "Bitmap": "example.png",
+    })
     add_static(screen, "background", "background.png", 0, 0, 188, 480)
 
     time_digits = bitmap_list("time_", 10)
@@ -105,18 +172,32 @@ def build(device_type: int, project_id: int, title: str) -> ET.ElementTree:
     add_number(screen, "minute_tens", time_digits, 28, 254, SOURCES["minute_tens"], 1)
     add_number(screen, "minute_ones", time_digits, 96, 254, SOURCES["minute_ones"], 1)
 
-    add_number(screen, "year", date_digits, 210, 60, SOURCES["year"], 4, 1)
-    add_number(screen, "month", date_digits, 276, 60, SOURCES["month"], 2, 1)
-    add_number(screen, "day", date_digits, 306, 60, SOURCES["day"], 2, 1)
-    add_indexed(screen, "weekday", indexed_list("week_", 7), 210, 92, SOURCES["weekday"])
+    add_number(screen, "year", date_digits, 198, 60, SOURCES["year"], 4, 1)
+    add_number(screen, "month", date_digits, 264, 60, SOURCES["month"], 2, 1)
+    add_number(screen, "day", date_digits, 294, 60, SOURCES["day"], 2, 1)
+    add_indexed(screen, "weekday", indexed_list("week_", 7), 198, 92, SOURCES["weekday"])
 
-    add_indexed(screen, "weather_icon", indexed_list("weather_", 29), 210, 138, SOURCES["weather_icon"])
-    add_number(screen, "weather_low", signed_digits, 264, 145, SOURCES["weather_low"], 3, blanking=1)
-    add_number(screen, "weather_high", signed_digits, 300, 145, SOURCES["weather_high"], 3, blanking=1)
-    add_number(screen, "steps", date_digits, 210, 225, SOURCES["steps"], 6, 1, 1)
-    add_number(screen, "heart", date_digits, 210, 290, SOURCES["heart"], 3, blanking=1)
-    add_indexed(screen, "battery_bar", indexed_list("battery_", 10, 10), 210, 365, SOURCES["battery"])
-    add_number(screen, "battery", date_digits, 268, 365, SOURCES["battery"], 3, 1, 1)
+    add_indexed(
+        screen,
+        "weather_icon",
+        indexed_list("weather_", 29),
+        198,
+        138,
+        SOURCES["weather_icon"],
+    )
+    add_number(screen, "weather_low", signed_digits, 250, 145, SOURCES["weather_low"], 3, blanking=1)
+    add_number(screen, "weather_high", signed_digits, 286, 145, SOURCES["weather_high"], 3, blanking=1)
+    add_number(screen, "steps", date_digits, 198, 225, SOURCES["steps"], 6, 1, 1)
+    add_number(screen, "heart", date_digits, 198, 290, SOURCES["heart"], 3, blanking=1)
+    add_indexed(
+        screen,
+        "battery_bar",
+        indexed_list("battery_", 10, 10),
+        198,
+        365,
+        SOURCES["battery"],
+    )
+    add_number(screen, "battery", date_digits, 256, 365, SOURCES["battery"], 3, 1, 1)
     return ET.ElementTree(root)
 
 
@@ -131,7 +212,9 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.device_type == 11 and not args.accept_reference_device_type:
-        parser.error("DeviceType 11 is only an 8/9 Pro reference; acknowledge it explicitly")
+        parser.error(
+            "DeviceType 11 is only an 8/9 Pro reference; acknowledge it explicitly"
+        )
 
     images = args.output_dir / "images"
     copy_assets(args.source_assets, images)
