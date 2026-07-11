@@ -1,8 +1,27 @@
 # TIME FLIES — Xiaomi Smart Band 10 Pro research project
 
-## v0.7.1：目标证据分层与包检查
+## v0.7.2：真机身份已确认
 
-项目保留两个候选画布，但不会把“屏幕规格”“可用编译链”和“真机兼容性”混为一谈。
+用户提供的实机照片已经确认：
+
+```text
+设备：小米手环10 Pro / Xiaomi Smart Band 10 Pro
+型号：M2551B1
+系统：Xiaomi HyperOS
+OS 版本：3.101.030
+```
+
+照片本身不提交到仓库，只保存推导出的非敏感设备信息。结构化记录位于：
+
+```text
+reference/real-device/M2551B1.json
+```
+
+这解决了“目标设备到底是什么”的问题，但尚未解决表盘包格式、`deviceSource`、MiCreate `DeviceType` 和真机安装兼容性。
+
+## 目标证据分层
+
+项目不会把“屏幕规格”“可用编译链”和“真机兼容性”混为一谈。
 
 每个 target profile 分别记录：
 
@@ -16,10 +35,10 @@
 
 | Profile | Canvas | 主要价值 | 关键限制 |
 | --- | --- | --- | --- |
-| `compat-336x480` | 336×480 | Mi Band 8/9 Pro 的 MiCreate 构建链已有真机参考 | 没有 10 Pro 安装验证 |
-| `experimental-400x480` | 400×480 | 10 Pro 已正式发布；发布前资料报告面板为 480×400 | 没有公开编译器目标或包元数据 |
+| `compat-336x480` | 336×480 | Mi Band 8/9 Pro 的 MiCreate 构建链已有真机参考；实机照片的屏幕比例也更接近该候选 | 还没有 10 Pro 安装验证 |
+| `experimental-400x480` | 400×480 | 对应发布前报道的 480×400 面板数据 | 没有公开编译器目标或包元数据 |
 
-默认仍使用 `compat-336x480`，因为它拥有更强的构建链证据；`experimental-400x480` 是当前更强的硬件布局候选。
+默认仍使用 `compat-336x480`，因为它拥有更强的构建链证据；照片只提供视觉支持，不能单独证明真实像素分辨率。
 
 ## 当前功能
 
@@ -32,55 +51,9 @@
 - 项目校验器、`app.json` 生成器和目标配置切换器。
 - MiCreate `.fprj` 格式探针与生成器。
 - GitHub Actions 自动语法、结构、profile 和包检查。
-
-## Profile schema
-
-```text
-targets/
-├── README.md
-├── profile.schema.json
-├── compat-336x480.json
-└── experimental-400x480.json
-```
-
-校验所有候选配置：
-
-```bash
-python tools/validate_target_profiles.py targets
-```
-
-切换目标配置：
-
-```bash
-python tools/apply_target_profile.py . targets/compat-336x480.json
-python tools/apply_target_profile.py . targets/experimental-400x480.json
-```
-
-应用后运行：
-
-```bash
-python tools/validate_project.py .
-```
+- 递归表盘包检查器。
 
 ## 表盘包检查器
-
-新增：
-
-```text
-tools/inspect_watchface_package.py
-PACKAGE_INSPECTION.md
-```
-
-它可以检查：
-
-- ZIP 型 `.bin`、`.zpk` 和嵌套 ZIP。
-- MiCreate `.fprj`、`.info` 和 `.face` 相关文件。
-- JSON/XML 元数据。
-- PNG/TGA 图片头和常见尺寸。
-- `deviceSource`、`DeviceType`、`DeviceVersion`、`designWidth`。
-- Mi Band、Smart Band、Amazfit、HyperOS、Zepp、EasyFace、MiCreate、`gts` 和 `nxp` 等字符串。
-
-使用：
 
 ```bash
 python tools/inspect_watchface_package.py package.face \
@@ -88,37 +61,29 @@ python tools/inspect_watchface_package.py package.face \
   --markdown package-report.md
 ```
 
-检查器支持三层嵌套归档；当真实 10 Pro 原厂或第三方表盘包出现时，可直接生成结构化证据报告。
+它支持 ZIP 型 `.bin`、`.zpk`、嵌套 ZIP、MiCreate `.fprj/.info/.face`、JSON/XML、PNG/TGA，并会寻找：
 
-## v0.7.1 实际校验
+- `deviceSource`
+- `DeviceType`
+- `DeviceVersion`
+- `designWidth`
+- 型号名、HyperOS、Zepp、MiCreate、EasyFace、`gts`、`nxp`
 
-- 两个 profile 均通过 schema 和几何校验。
-- `compat-336x480` 的右栏有效内容宽度为 128px。
-- `experimental-400x480` 的右栏有效内容宽度为 172px。
-- 两个 profile 均能在临时工程中应用，并正确更新 JS 常量、`app.js` 和 `app.json.example`。
-- 原 TIME FLIES 包被识别为 177 个条目的 ZIP 编译包，其中检测到 160 张 TGA 图片和 `gts/nxp` 元数据。
-- Amazfit Band 7 参考包可递归读取两层归档，识别出 `194×368` 和 `deviceSource 252/253/254`。
-- GitHub Actions 会逐个切换全部候选 profile，并运行包检查器冒烟测试。
+## 当前最关键的下一步
 
-## 当前最强证据
+从这台型号为 `M2551B1`、系统为 HyperOS `3.101.030` 的真机配套 Mi Fitness 中取得一个表盘包或缓存文件。拿到后，现有检查器可以直接判断：
 
-Smart Band 10 Pro 已于 2026 年 5 月公开发布，公开发布报道一致提到 1.74 英寸 AMOLED 屏幕；`480 × 400` 仍主要来自发布前报道。当前仍没有公开的 EasyFace/MiCreate 10 Pro 目标、`deviceSource`、原厂表盘包或已复现的真机安装结果。
-
-详细证据见：
-
-- `TARGET_RESEARCH.md`
-- `COMPILER_RESEARCH.md`
-- `MICREATE_FORMAT.md`
-- `PACKAGE_INSPECTION.md`
-- `reference/mi-band-9-pro/`
-- `reference/original-band7/`
+- 是否为 `.face`、`.bin`、`.zpk` 或其他格式；
+- 实际画布尺寸；
+- 设备型号和平台标识；
+- 是否沿用 Mi Band 8/9 Pro 的 `DeviceType=11`；
+- 是否需要 EasyFace、MiCreate 或另一套工具链。
 
 ## 当前状态
 
-这是开发源码，不是可安装的 Smart Band 10 Pro 表盘。剩余关键阻塞项是：
+这是开发源码，不是可安装的 Smart Band 10 Pro 表盘。已经确认真实设备型号与系统版本，但仍缺：
 
-- Smart Band 10 Pro 官方或已验证的编译目标。
-- 真实 10 Pro 官方/第三方表盘包。
-- 可确认的设备型号、包头或平台标识。
-- MiCreate 或 EasyFace 在 Windows 上的实际打开、构建结果。
-- 模拟器或真机安装测试。
+- 原厂或第三方 10 Pro 表盘包；
+- 可确认的 `deviceSource` / `DeviceType`；
+- MiCreate 或 EasyFace 在 Windows 上的实际构建结果；
+- 真机安装测试。
