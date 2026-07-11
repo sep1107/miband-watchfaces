@@ -52,6 +52,8 @@ jobs:
           source/miband10pro/tools/test_p67_binary_layout.py
           source/miband10pro/tools/p67_image_codec.py
           source/miband10pro/tools/test_p67_image_codec.py
+          source/miband10pro/tools/p67_minimal_builder.py
+          source/miband10pro/tools/test_p67_minimal_builder.py
 
       - name: Validate source checkout
         run: >-
@@ -108,6 +110,33 @@ jobs:
       - name: Test P67 indexed8 image codec
         run: >-
           python source/miband10pro/tools/test_p67_image_codec.py
+
+      - name: Test minimal P67 resource builder
+        run: >-
+          python source/miband10pro/tools/test_p67_minimal_builder.py
+
+      - name: Generate and re-inspect minimal P67 resource.bin
+        run: |
+          python source/miband10pro/tools/p67_minimal_builder.py \
+            /tmp/p67-minimal-resource.bin
+          python source/miband10pro/tools/inspect_p67_binary.py \
+            /tmp/p67-minimal-resource.bin \
+            --json /tmp/p67-minimal-report.json \
+            --markdown /tmp/p67-minimal-report.md
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('/tmp/p67-minimal-report.json').read_text(encoding='utf-8'))
+          assert report['header']['themeCount'] == 1
+          assert report['format']['themeSize'] == 176
+          assert report['recordCount'] == 2
+          assert report['recordTypeCounts'] == {'image': 1, 'layout': 1}
+          assert report['validation']['errors'] == []
+          assert Path('/tmp/p67-minimal-resource.bin').stat().st_size % 4 == 0
+          print('Generated minimal P67 resource passed reverse inspection')
+          PY
+          test -s /tmp/p67-minimal-report.md
 
       - name: Apply P67 geometry to legacy visual prototype
         shell: bash
