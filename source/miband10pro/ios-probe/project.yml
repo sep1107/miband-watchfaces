@@ -1,0 +1,26 @@
+name: P67ReadOnlyProbe
+options:
+  bundleIdPrefix: com.sep1107
+  createIntermediateGroups: true
+
+targets:
+  P67ReadOnlyProbe:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: P67ProbeApp.swift
+      - path: P67ReadOnlyProbe.swift
+      - path: P67ReadOnlyProbeView.swift
+    info:
+      path: Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.sep1107.p67-read-only-probe
+        PRODUCT_NAME: P67ReadOnlyProbe
+        SWIFT_VERSION: 5.9
+        SWIFT_STRICT_CONCURRENCY: minimal
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+    scheme:
+      gatherCoverageData: false
