@@ -1,0 +1,52 @@
+name: Validate TIME FLIES P67 watchface
+
+on:
+  push:
+    paths:
+      - 'source/miband10pro/tools/p67_image_codec.py'
+      - 'source/miband10pro/tools/p67_time_flies_*.py'
+      - '.github/workflows/validate-time-flies-p67.yml'
+  pull_request:
+    paths:
+      - 'source/miband10pro/tools/p67_image_codec.py'
+      - 'source/miband10pro/tools/p67_time_flies_*.py'
+      - '.github/workflows/validate-time-flies-p67.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-watchface:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile P67 watchface tools
+        run: >-
+          python -m py_compile
+          source/miband10pro/tools/p67_image_codec.py
+          source/miband10pro/tools/p67_time_flies_assets.py
+          source/miband10pro/tools/p67_time_flies_builder.py
+          source/miband10pro/tools/test_p67_time_flies_builder.py
+      - name: Test dynamic TIME FLIES records
+        run: python source/miband10pro/tools/test_p67_time_flies_builder.py
+      - name: Build complete P67 package
+        run: |
+          python source/miband10pro/tools/p67_time_flies_builder.py \
+            /tmp/time-flies-p67 \
+            --zip /tmp/time-flies-p67.zip \
+            > /tmp/time-flies-report.json
+          python -m json.tool /tmp/time-flies-report.json > /dev/null
+          test -s /tmp/time-flies-p67/resource.bin
+          test -s /tmp/time-flies-p67/preview/preview.png
+          test -s /tmp/time-flies-p67.zip
+      - name: Upload structural candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: time-flies-p67-structural-candidate
+          path: |
+            /tmp/time-flies-p67.zip
+            /tmp/time-flies-report.json
+          if-no-files-found: error
