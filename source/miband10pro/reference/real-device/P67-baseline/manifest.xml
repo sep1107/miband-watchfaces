@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Watchface name="@watchfaceName" width="336" height="480" id="120917384229" SKU="false" compressMethod="RLEReversed" advanced="false" interactive="false" support_literal="false" editable="true">
+  <Resources />
+  <Theme type="normal" name="样式1" bgColor="#000000" isPhotoAlbumWatchface="false" preview="@Image1" />
+  <Theme type="normal" name="样式2" bgColor="#000000" isPhotoAlbumWatchface="false" preview="@Image17" />
+  <Theme type="normal" name="样式3" bgColor="#000000" isPhotoAlbumWatchface="false" preview="@Image24" />
+</Watchface>
