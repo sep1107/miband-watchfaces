@@ -6,14 +6,15 @@ try {
       lang: new DeviceRuntimeCore.HmUtils.Lang(
         DeviceRuntimeCore.HmUtils.getLanguage()
       ),
-      px: DeviceRuntimeCore.HmUtils.getPx(400)
+      px: DeviceRuntimeCore.HmUtils.getPx(336)
     };
 
     app.app = DeviceRuntimeCore.App({
       globalData: {
         model: 'Xiaomi Smart Band 10 Pro',
-        canvasWidth: 400,
+        canvasWidth: 336,
         canvasHeight: 480,
+        targetProfile: 'compat-336x480',
         provisionalTarget: true
       },
       onCreate() {},
