@@ -1,45 +1,46 @@
 # Compiler research
 
-## EasyFace
+## Verified P67 path
 
-The latest EasyFace release checked for this project is **EasyFace Compiler v4.22**, published on **2026-07-08**.
-
-Its release note says:
+The real M2551B1 package establishes the required output family:
 
 ```text
-Mi Band 10 Support added
+manifest semantics + indexed8/RLEReversed resources
+    -> resource.bin with magic 0x1234A55A
+    -> P67 BIN package
 ```
 
-Source: https://github.com/m0tral/EasyFace/releases/tag/v4.22
+The capability protocol (`1.9.4`) and the protocol encoded in the observed binary header (`0.9.3`) are separate values.
 
-## What this confirms
+## Public binary implementation reference
 
-- EasyFace now has an explicit compiler path for the standard Mi Band 10.
-- The project is no longer blocked by a complete absence of Mi Band 10 tooling.
+A public watchface implementation uses the same `0x1234A55A` magic and exposes structures for:
 
-## What it does not confirm
+- file header and version fields;
+- themes and record tables;
+- layouts, images and image arrays;
+- data items, slots and widgets;
+- binary resource addresses and deduplication.
 
-- The release note does not explicitly mention Xiaomi Smart Band 10 Pro.
-- No verified Smart Band 10 Pro `deviceSource`, screen orientation, compiler profile, or package identifier has been found in public source files.
-- A standard Mi Band 10 build must not be relabeled as a 10 Pro build without verification.
-
-## Next EasyFace test
-
-Once the EasyFace v4.22 compiler assets are available on a Windows environment:
-
-1. Import or reconstruct the project using the Mi Band 10 target.
-2. Inspect the generated target configuration and package metadata.
-3. Compare its canvas and device identifiers against a known Smart Band 10 Pro watchface package.
-4. Only generate `app.json` with `tools/build_app_json.py` after the target values are verified.
-
-## Mi Band 9 Pro / MiCreate reference
-
-A real-device-tested Mi Band 9 Pro project was found on GitHub. It uses MiCreate `.fprj` projects, a `336 × 480` example image, and Mi Band 8 Pro target metadata. Its output directory contains `.face` files and `.info` metadata.
-
-This is currently a stronger development reference for the Pro form factor than unverified media resolution claims. It introduces a second possible build path:
+Reference:
 
 ```text
-TIME FLIES assets + MiCreate project -> .face
+https://github.com/mokshjain-cmd/watchface-merged/tree/main/ZhouHaiWatchFace/WatchBin
 ```
 
-The path still requires a known Smart Band 10 Pro target or a 10 Pro package for comparison.
+This code is a research reference, not yet a proven P67 compiler. Its image encoding, record variants and package assembly must be compared byte-for-byte against the real P67 sample before use.
+
+## Legacy tools
+
+- EasyFace support for the standard Mi Band 10 does not establish Smart Band 10 Pro compatibility.
+- MiCreate projects for Mi Band 8/9 Pro are related-device references only.
+- The Zepp OS `app.json` project is retained solely as a visual prototype.
+
+## Implementation plan
+
+1. Parse the complete P67 header, theme tables and record tables.
+2. Map manifest element types to binary record types.
+3. Reproduce indexed8 palette conversion.
+4. Reproduce `RLEReversed` image encoding.
+5. Build a minimal one-theme package and compare structure with the official sample.
+6. Test installation on M2551B1 only after static checks pass.
