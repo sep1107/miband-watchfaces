@@ -15,7 +15,7 @@ Neither source proves that the P67 device accepts a custom watchface from iOS. M
 
 The My Band implementation uses CoreBluetooth and Xiaomi's BLE command/data channel.
 
-Gadgetbridge currently labels both Smart Band 10 and Smart Band 10 Pro coordinators as `BT_CLASSIC`. That label may describe the preferred Android connection backend rather than prove that every command requires classic Bluetooth, because the shared Xiaomi stack also defines BLE scan filters and GATT services.
+Gadgetbridge currently labels both Smart Band 10 and Smart Band 10 Pro coordinators as `BT_CLASSIC`. Its `ConnectionType` enum defines that value as classic Bluetooth enabled and BLE disabled. At the same time, the shared Xiaomi coordinator still inherits the BLE coordinator, defines FE95 scan filters and uses the common Xiaomi service stack. This contradiction is consistent with experimental support and is not enough to decide the iPhone path without measuring the physical P67 device.
 
 The unresolved question is therefore narrow:
 
@@ -28,17 +28,32 @@ Until this is measured on the physical device, the project must not describe iPh
 Validation should advance without sending a custom watchface first:
 
 1. **Advertisement only** — confirm that iPhone sees the P67 device name and advertised service UUIDs.
-2. **Authenticated BLE connection** — confirm that the existing 16-byte Xiaomi AuthKey can establish the session.
-3. **Service discovery** — record whether the Xiaomi service and command/data characteristics used by My Band are present.
+2. **Service discovery** — connect without an AuthKey and record whether FE95 plus characteristics 005E and 005F are visible.
+3. **Authenticated BLE connection** — only after service discovery succeeds, confirm that the existing 16-byte Xiaomi AuthKey can establish the session.
 4. **Read-only watchface list** — send only the encrypted list command and verify that the band responds.
 5. **Official-file transfer probe** — only after the read-only path works, test the transfer framing with an already accepted official `resource.bin`; do not activate or delete anything automatically.
 6. **Generated probe** — attempt the minimal generated P67 face only after the official-file path and recovery procedure are proven.
 
+## Implemented discovery-only probe
+
+`ios-probe/P67ReadOnlyProbe.swift` now implements stages 1 and 2 only. It:
+
+- scans without a service filter and accepts only names beginning with `Xiaomi Smart Band 10 Pro`;
+- records advertised service UUIDs;
+- connects and discovers FE95;
+- discovers 005E and 005F and records their CoreBluetooth properties;
+- exports the result as JSON;
+- disconnects immediately after discovery.
+
+It intentionally contains no authentication, notification subscription, characteristic write, upload, activation or deletion code. The existing Python regression test scans the Swift source for required discovery calls and rejects known write/upload APIs, so a future change cannot silently turn the first probe into an installer.
+
+The probe has passed local static safety checks and is committed, but it has **not yet been compiled in Xcode or run on the user's physical iPhone and M2551B1**.
+
 ## iPhone-side requirements
 
-The existing My Band project requires a physical iPhone, Xcode, an Apple signing identity and the device AuthKey. It is not currently distributed through the App Store.
+A physical iPhone and an Xcode-signed app are required for the first test. The existing My Band project is a likely host because it already implements Xiaomi authentication and upload, but the discovery-only probe can also be placed in a tiny standalone Xcode project.
 
-The user does not need to install or build it yet. The next implementation task is to prepare a minimal P67-specific compatibility patch and a read-only diagnostic screen, so the first test cannot upload, activate or delete a face by accident.
+The user does not need to install or build anything yet. Before requesting a device test, the next implementation task is to add a minimal SwiftUI report screen and verify that the probe compiles without bringing any upload service into the target.
 
 ## Current project guarantees
 
@@ -47,6 +62,7 @@ The repository can already:
 - generate a structurally valid P67 `resource.bin` from scratch;
 - validate Gadgetbridge-compatible magic, numeric ID, preview offset and normal or localized name metadata;
 - create Xiaomi watchface upload envelopes with MD5, CRC32 and ordered chunks;
-- reverse-inspect the generated binary and transfer payload.
+- reverse-inspect the generated binary and transfer payload;
+- perform a discovery-only iPhone scan/service probe guarded against write and upload APIs.
 
 These are static and protocol-level guarantees only. Physical-device acceptance remains unverified.
